@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registration</title>
+    <link rel="stylesheet" href="../CSS/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="navBar">
+          <a href="index.html">Home</a>
+          <a href="login.html">Login</a>
+        </div>
+        <h1>Registration</h1>
+      </div>
+      <form id="reg_form">
+        <div class="form-group">
+          <label for="full_name">Full Name</label>
+          <input type="text" id="fullname" />
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" />
+        </div>
+
+        <div class="form-group">
+          <label for="retype_password">Retype Password</label>
+          <input type="password" id="retype_password" />
+        </div>
+
+        <button type="submit" class="btn" id="reg_btn">Sign Up</button>
+      </form>
+      <!-- <a href="login.html">>> Login</a> -->
+    </div>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+    <script src="../JS/registration.js"></script>
+  </body>
+</html>
