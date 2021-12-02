@@ -3,4 +3,4 @@
 
 # ER Diagram
 
-![alt text](Social Media.drawio.png)
+![alt text]("Social Media.drawio.png")
