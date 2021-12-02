@@ -17,9 +17,9 @@ public class User {
     @Column(unique=true)
     private String username;
     private String password;
-    @ManyToMany()
+    @ManyToMany (fetch = FetchType.LAZY)
     @JoinTable(
-            name = "User_and_UserRole_map",
+            name = "User_UserRole_map",
             joinColumns = @JoinColumn (
                     name = "user_id",
                     referencedColumnName = "userId"

@@ -39,14 +39,12 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         String userName = request.getParameter("username");
         String password = request.getParameter("password");
         UsernamePasswordAuthenticationToken authenticate = new UsernamePasswordAuthenticationToken(userName, password);
-        Authentication authentication = authenticationManager.authenticate(authenticate);
         try {
-            authentication = authenticationManager.authenticate(authenticate);
-            return authenticate;
+            return authenticationManager.authenticate(authenticate);
         } catch(Exception e) {
             System.out.println(e.getMessage());
         }
-        return authenticate;
+        return null;
     }
 
     @Override
@@ -60,10 +58,5 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         tokens.put("refresh-token", refresh_token);
         response.setContentType(APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(), tokens);
-    }
-
-    @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-        AddMessageToResponse.addMessageToResponse(response, failed.getMessage());
     }
 }

@@ -1,9 +1,15 @@
 package com.socialmedia.socialmedia;
 
+import com.socialmedia.socialmedia.user.IUserService;
+import com.socialmedia.socialmedia.user.User;
+import com.socialmedia.socialmedia.user.role.UserRole;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.util.ArrayList;
 
 @SpringBootApplication
 public class SocialmediaApplication {
@@ -16,7 +22,7 @@ public class SocialmediaApplication {
 		return new BCryptPasswordEncoder();
 	}
 //	@Bean
-//	CommandLineRunner run(UserService userService) {
+//	CommandLineRunner run(IUserService userService) {
 //		return args -> {
 //			userService.saveRole(new UserRole("ROLE_USER"));
 //			userService.saveRole(new UserRole("ROLE_ROOT"));

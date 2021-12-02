@@ -36,11 +36,10 @@ public class UserController {
 
     @GetMapping("/users")
     public List<User> getAllUsers(@RequestHeader HttpHeaders headers) {
-        throw new ApiRequestException("error", HttpStatus.NOT_FOUND);
-//        String token = headers.get("Authorization").get(0).replace("Bearer ", "");
-//        String userName = jwtUtil.extractUsername(token);
-//        User user = userService.getUserByUserName(userName);
-//        return userService.getAllUsers(user.getUserId());
+        String token = headers.get("Authorization").get(0).replace("Bearer ", "");
+        String userName = jwtUtil.extractUsername(token);
+        User user = userService.getUserByUserName(userName);
+        return userService.getAllUsers(user.getUserId());
     }
 
     @PostMapping("/add_user")
@@ -89,4 +88,5 @@ public class UserController {
             throw new ApiRequestException("Token is not Passed", FORBIDDEN);
         }
     }
+
 }

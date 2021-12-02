@@ -32,37 +32,41 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if(request.getServletPath().equals("/login") || request.getServletPath().equals("/refresh_token")) {
+        if(request.getServletPath().equals("/login")) {
             filterChain.doFilter(request, response);
-        }
-        String authorizationHeader = request.getHeader(AUTHORIZATION);
-        if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            String token = authorizationHeader.replace("Bearer ", "");
-            String userName = null;
-            try {
-                userName = jwtUtil.extractUsername(token);
-            } catch (ExpiredJwtException e) {
-                AddMessageToResponse.addMessageToResponse(response, e.getMessage());
-                return;
-            } catch (SignatureException e) {
-                AddMessageToResponse.addMessageToResponse(response, e.getMessage());
-                return;
-            }
-
-            UserDetails userDetails = userService.loadUserByUsername(userName);
-            if(jwtUtil.validateToken(token, userDetails)) {
-                Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails,
-                        null,
-                        userDetails.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-                filterChain.doFilter(request, response);
-            } else {
-                AddMessageToResponse.addMessageToResponse(response, "Token is not Valid");
-                return;
-            }
+            AddMessageToResponse.addMessageToResponse(response, "Authentication Failed");
+        } else if (request.getServletPath().equals("/refresh_token")) {
+            filterChain.doFilter(request, response);
         } else {
-            AddMessageToResponse.addMessageToResponse(response, "Token is not Passed");
-            return;
+            String authorizationHeader = request.getHeader(AUTHORIZATION);
+            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+                String token = authorizationHeader.replace("Bearer ", "");
+                String userName = null;
+                try {
+                    userName = jwtUtil.extractUsername(token);
+                } catch (ExpiredJwtException e) {
+                    AddMessageToResponse.addMessageToResponse(response, e.getMessage());
+                    return;
+                } catch (SignatureException e) {
+                    AddMessageToResponse.addMessageToResponse(response, e.getMessage());
+                    return;
+                }
+
+                UserDetails userDetails = userService.loadUserByUsername(userName);
+                if (jwtUtil.validateToken(token, userDetails)) {
+                    Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails,
+                            null,
+                            userDetails.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    filterChain.doFilter(request, response);
+                } else {
+                    AddMessageToResponse.addMessageToResponse(response, "Token is not Valid");
+                    return;
+                }
+            } else {
+                AddMessageToResponse.addMessageToResponse(response, "Token is not Passed");
+                return;
+            }
         }
 
     }
