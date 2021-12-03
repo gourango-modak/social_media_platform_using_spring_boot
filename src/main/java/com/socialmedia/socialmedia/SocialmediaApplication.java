@@ -24,20 +24,15 @@ public class SocialmediaApplication {
 //	@Bean
 //	CommandLineRunner run(IUserService userService) {
 //		return args -> {
-//			userService.saveRole(new UserRole("ROLE_USER"));
-//			userService.saveRole(new UserRole("ROLE_ROOT"));
-//			userService.saveRole(new UserRole("ROLE_ADMIN"));
-//			userService.saveRole(new UserRole("ROLE_SUPER_ADMIN"));
+//			UserRole nUser = userService.saveRole(new UserRole("ROLE_USER"));
+//			UserRole rootUser = userService.saveRole(new UserRole("ROLE_ROOT"));
+//			UserRole adminUser = userService.saveRole(new UserRole("ROLE_ADMIN"));
+//			UserRole superAdimUser = userService.saveRole(new UserRole("ROLE_SUPER_ADMIN"));
 //
-//			userService.saveUser(new User("Sajib Modak", "sajib", "1", new ArrayList<>()));
-//			userService.saveUser(new User("Rimon Modak", "rimon", "1", new ArrayList<>()));
-//			userService.saveUser(new User("Rajesh Modak", "rajesh", "1", new ArrayList<>()));
-//			userService.saveUser(new User("Anik Modak", "anik", "1", new ArrayList<>()));
-//
-//			userService.addRoleToUser("sajib", "ROLE_USER");
-//			userService.addRoleToUser("rimon", "ROLE_ADMIN");
-//			userService.addRoleToUser("anik", "ROLE_SUPER_ADMIN");
-//			userService.addRoleToUser("anik", "ROLE_ROOT");
+//			userService.saveUser(new User("Sajib Modak", "sajib", "1", rootUser));
+//			userService.saveUser(new User("Rimon Modak", "rimon", "1", adminUser));
+//			userService.saveUser(new User("Rajesh Modak", "rajesh", "1", superAdimUser));
+//			userService.saveUser(new User("Anik Modak", "anik", "1", nUser));
 //		};
 //	}
 }

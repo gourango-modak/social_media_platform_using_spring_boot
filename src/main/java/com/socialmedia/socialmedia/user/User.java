@@ -3,9 +3,6 @@ package com.socialmedia.socialmedia.user;
 import com.socialmedia.socialmedia.user.role.UserRole;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 @Entity
 @Table(name = "Users")
@@ -17,35 +14,24 @@ public class User {
     @Column(unique=true)
     private String username;
     private String password;
-    @ManyToMany (fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "User_UserRole_map",
-            joinColumns = @JoinColumn (
-                    name = "user_id",
-                    referencedColumnName = "userId"
-            ),
-            inverseJoinColumns = @JoinColumn (
-                    name = "userrole_id",
-                    referencedColumnName = "roleId"
-            )
-    )
-    private Collection<UserRole> userRole = new ArrayList<>();
+    @OneToOne
+    private UserRole userRole;
 
     public User() {
     }
 
-    public User(String name, String username, String password, List<UserRole> userRole) {
+    public User(String name, String username, String password, UserRole userRole) {
         this.name = name;
         this.username = username;
         this.password = password;
         this.userRole = userRole;
     }
 
-    public Collection<UserRole> getUserRoles() {
+    public UserRole getUserRole() {
         return userRole;
     }
 
-    public void setUserRole(Collection<UserRole> userRole) {
+    public void setUserRole(UserRole userRole) {
         this.userRole = userRole;
     }
 

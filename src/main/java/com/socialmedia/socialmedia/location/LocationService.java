@@ -19,9 +19,11 @@ public class LocationService {
     public List<Location> getAllLocations() {
         return locationRepository.findAll();
     }
+
     public Location addLocation(Location location) {
         return locationRepository.save(location);
     }
+
     public Location findByLocationName(String name) {
         return locationRepository.findByName(name);
     }

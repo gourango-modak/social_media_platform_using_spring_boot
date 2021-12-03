@@ -5,7 +5,6 @@ import com.socialmedia.socialmedia.location.Location;
 import com.socialmedia.socialmedia.user.User;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Table(name = "Status")

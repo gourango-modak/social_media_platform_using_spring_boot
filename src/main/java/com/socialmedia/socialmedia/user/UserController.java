@@ -8,8 +8,6 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,26 +36,21 @@ public class UserController {
     public List<User> getAllUsers(@RequestHeader HttpHeaders headers) {
         String token = headers.get("Authorization").get(0).replace("Bearer ", "");
         String userName = jwtUtil.extractUsername(token);
-        User user = userService.getUserByUserName(userName);
-        return userService.getAllUsers(user.getUserId());
+        return userService.getAllUsers(userName);
+    }
+
+    @PostMapping("/add_role")
+    public UserRole addRole(@RequestBody UserRole userRole) {
+        return userService.saveRole(userRole);
     }
 
     @PostMapping("/add_user")
     public User addUser(@RequestBody User user) {
-        User db_user = userService.getUserByUserName(user.getUsername());
-        if(db_user != null) throw new ApiRequestException("Username is available!!", HttpStatus.CONFLICT);
         return userService.saveUser(user);
     }
-    @PostMapping("/add_role/{userId}")
-    public ResponseEntity<?> addRoleToUser(@PathVariable("userId") Long userId, @RequestBody UserRole userRole) {
-        User db_user = userService.getUserByUserId(userId);
-        if(db_user == null) throw new ApiRequestException("Username is not available!!", HttpStatus.NOT_FOUND);
-        Long db_userId = userService.isRoleAssigned(userId, userRole.getName());
-        if(db_userId == null) {
-            userService.addRoleToUser(userService.getUserByUserId(userId).getUsername(), userRole.getName());
-            return ResponseEntity.ok("Role Added.");
-        }
-        return ResponseEntity.ok("Role is assigned before.");
+    @PostMapping("/{userId}/update_role")
+    public void updateUserRole(@PathVariable("userId") Long userId, @RequestBody UserRole userRole) {
+        userService.updateUserRole(userId, userRole);
     }
 
     @GetMapping("/refresh_token")
