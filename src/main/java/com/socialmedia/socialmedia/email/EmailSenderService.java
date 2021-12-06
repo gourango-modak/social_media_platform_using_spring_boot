@@ -40,7 +40,7 @@ public class EmailSenderService {
         MimeMessageHelper mimeMessageHelper
                 = new MimeMessageHelper(mimeMessage, true);
 
-        mimeMessageHelper.setFrom("spring.email.from@gmail.com");
+        mimeMessageHelper.setFrom("gourango.modak.brainstation23@gmail.com");
         mimeMessageHelper.setTo(toEmail);
         mimeMessageHelper.setText(body);
         mimeMessageHelper.setSubject(subject);
