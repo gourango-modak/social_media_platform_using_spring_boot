@@ -14,7 +14,7 @@ public class PublishController {
     @Autowired
     private JmsTemplate jmsTemplate;
 
-    @PostMapping("/publishMessage")
+    @PostMapping("/send_mail_to_all")
     public ResponseEntity<String> publishMessage(@RequestBody Message message) {
         try {
             jmsTemplate.convertAndSend("MailBroker-queue", message);

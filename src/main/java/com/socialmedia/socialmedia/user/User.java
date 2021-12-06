@@ -14,17 +14,28 @@ public class User {
     @Column(unique=true)
     private String username;
     private String password;
+    private String email;
     @OneToOne
     private UserRole userRole;
 
     public User() {
     }
 
-    public User(String name, String username, String password, UserRole userRole) {
+    public User(Long userId, String name, String username, String password, String email, UserRole userRole) {
+        this.userId = userId;
         this.name = name;
         this.username = username;
         this.password = password;
+        this.email = email;
         this.userRole = userRole;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public UserRole getUserRole() {
