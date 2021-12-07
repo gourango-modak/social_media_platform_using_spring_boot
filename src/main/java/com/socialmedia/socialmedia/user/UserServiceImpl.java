@@ -1,6 +1,7 @@
 package com.socialmedia.socialmedia.user;
 
 import com.socialmedia.socialmedia.exception.ApiRequestException;
+import com.socialmedia.socialmedia.message.APIMessage;
 import com.socialmedia.socialmedia.user.role.UserRole;
 import com.socialmedia.socialmedia.user.role.UserRoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +13,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+
+import static java.util.Map.entry;
 
 @Service
 public class UserServiceImpl implements IUserService, UserDetailsService {
@@ -39,8 +40,18 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
     @Override
     public User saveUser(User user) {
-        User db_user = userRepository.findByUsername(user.getUsername());
-        if(db_user != null) throw new ApiRequestException("Username is available!!", HttpStatus.CONFLICT);
+        User getUserByName = userRepository.findByUsername(user.getUsername());
+        User getUserByEmail = userRepository.findByEmail(user.getEmail());
+        if(getUserByName != null && getUserByEmail != null) throw new ApiRequestException(new APIMessage(HttpStatus.FOUND, Map.ofEntries(
+                entry("username", "username is already available."),
+                entry("email", "email is already available.")
+        ), new HashMap<>(), null));
+        else if(getUserByName != null && getUserByEmail == null) throw new ApiRequestException(new APIMessage(HttpStatus.FOUND, Map.ofEntries(
+                entry("username", "username is already available.")
+        ), new HashMap<>(), null));
+        else if(getUserByName == null && getUserByEmail != null) throw new ApiRequestException(new APIMessage(HttpStatus.FOUND, Map.ofEntries(
+                entry("email", "email is already available.")
+        ), new HashMap<>(), null));
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
@@ -57,7 +68,8 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
         try {
             userRoleDB = userRoleRepository.findByName(userRole.getName());
         } catch (Exception e) {
-            throw new ApiRequestException(e.getMessage(), HttpStatus.NOT_FOUND);
+            System.out.println(e.getMessage());
+//            throw new ApiRequestException(e.getMessage(), HttpStatus.NOT_FOUND);
         }
         User user = userRepository.findById(userId).get();
         user.setUserRole(userRoleDB);
@@ -79,7 +91,8 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);
         if(user == null)
-            throw new ApiRequestException("User Not Found!!", HttpStatus.FORBIDDEN);
+            System.out.println("Error");
+//            throw new ApiRequestException("User Not Found!!", HttpStatus.FORBIDDEN);
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(user.getUserRole().getName()));
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);

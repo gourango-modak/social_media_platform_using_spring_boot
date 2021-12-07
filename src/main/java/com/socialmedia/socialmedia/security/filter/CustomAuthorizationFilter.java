@@ -35,7 +35,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         if(request.getServletPath().equals("/login")) {
             filterChain.doFilter(request, response);
             AddMessageToResponse.addMessageToResponse(response, "Authentication Failed");
-        } else if (request.getServletPath().equals("/refresh_token")) {
+        } else if (request.getServletPath().equals("/refresh_token") || request.getServletPath().equals("/add_user")) {
             filterChain.doFilter(request, response);
         } else {
             String authorizationHeader = request.getHeader(AUTHORIZATION);

@@ -1,34 +1,20 @@
 package com.socialmedia.socialmedia.exception;
 
-import org.springframework.http.HttpStatus;
-
-import java.time.ZonedDateTime;
+import com.socialmedia.socialmedia.message.APIMessage;
 
 public class ApiRequestException extends RuntimeException {
 
-    private String message;
-    private HttpStatus httpStatus;
+    private APIMessage apiMessage;
 
-    public ApiRequestException(String message, HttpStatus httpStatus) {
-        this.message = message;
-        this.httpStatus = httpStatus;
+    public ApiRequestException(APIMessage APIMessage) {
+        this.apiMessage = APIMessage;
     }
 
-    @Override
-    public String getMessage() {
-        return message;
+    public APIMessage getAPIMessage() {
+        return apiMessage;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setMessage(APIMessage APIMessage) {
+        this.apiMessage = APIMessage;
     }
-
-    public HttpStatus getHttpStatus() {
-        return httpStatus;
-    }
-
-    public void setHttpStatus(HttpStatus httpStatus) {
-        this.httpStatus = httpStatus;
-    }
-
 }

@@ -8,4 +8,5 @@ import java.util.List;
 public interface IUserRepository extends JpaRepository<User, Long> {
     User findByUsername(String userName);
     List<User> findAllByUserRoleRoleIdLessThanEqual(Long roleId);
+    User findByEmail(String email);
 }

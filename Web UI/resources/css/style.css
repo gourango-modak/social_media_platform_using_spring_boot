@@ -1,4 +1,8 @@
-/* Initial Style for all tags */
+label {
+  margin-top: 1rem;
+}
+
+/* Initial Style for all tags
 
 * {
   margin: 0;
@@ -8,7 +12,8 @@
 
 input[type="text"],
 input[type="password"],
-input[type="username"] {
+input[type="username"],
+input[type="email"] {
   height: 2rem;
   padding: 0.5rem;
   font-size: 1rem;
@@ -33,7 +38,7 @@ label {
 }
 
 /* Common Classes */
-
+/* 
 .container {
   width: 50%;
   margin: auto;
@@ -69,8 +74,14 @@ label {
   text-decoration: underline;
 }
 
+.alert-danger {
+  color: red;
+  margin-top: 0.5rem;
+}
+
 /* Post form Style */
 
+/*
 textarea {
   font-size: 1rem;
   width: 100%;
@@ -95,7 +106,7 @@ textarea {
 }
 
 /* Status Styles */
-
+/*
 .hide {
   display: none;
 }
@@ -125,4 +136,4 @@ textarea {
   right: 0;
   top: 0;
   cursor: pointer;
-}
+} */

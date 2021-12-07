@@ -8,6 +8,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.ArrayList;
 
@@ -21,18 +23,15 @@ public class SocialmediaApplication {
 	public BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
+
 //	@Bean
 //	CommandLineRunner run(IUserService userService) {
 //		return args -> {
 //			UserRole nUser = userService.saveRole(new UserRole("ROLE_USER"));
 //			UserRole rootUser = userService.saveRole(new UserRole("ROLE_ROOT"));
-//			UserRole adminUser = userService.saveRole(new UserRole("ROLE_ADMIN"));
-//			UserRole superAdimUser = userService.saveRole(new UserRole("ROLE_SUPER_ADMIN"));
 //
-//			userService.saveUser(new User("Sajib Modak", "sajib", "1", rootUser));
-//			userService.saveUser(new User("Rimon Modak", "rimon", "1", adminUser));
-//			userService.saveUser(new User("Rajesh Modak", "rajesh", "1", superAdimUser));
-//			userService.saveUser(new User("Anik Modak", "anik", "1", nUser));
+//			userService.saveUser(new User("Sajib Modak", "sajib", "1","modaksajib708@gmail.com", rootUser));
+//			userService.saveUser(new User("Rimon Modak", "rimon", "1", "gourango.modak.2@gmail.com", nUser));
 //		};
 //	}
 }

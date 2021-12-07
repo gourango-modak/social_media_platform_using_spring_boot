@@ -48,7 +48,8 @@ public class StatusService {
             if(groupId != null) group = groupService.findGroupById(groupId);
             location = locationService.findByLocationName(body.get("location").toString().toLowerCase());
         } catch (Exception e) {
-            throw new ApiRequestException(e.getMessage(), HttpStatus.NOT_FOUND);
+            System.out.println(e.getMessage());
+//            throw new ApiRequestException(e.getMessage(), HttpStatus.NOT_FOUND);
         }
         if(groupId != null) status.setGroup(group);
         status.setUser(user);

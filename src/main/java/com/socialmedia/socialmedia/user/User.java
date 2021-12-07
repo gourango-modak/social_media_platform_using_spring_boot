@@ -14,6 +14,7 @@ public class User {
     @Column(unique=true)
     private String username;
     private String password;
+    @Column(unique=true)
     private String email;
     @OneToOne
     private UserRole userRole;
@@ -21,8 +22,7 @@ public class User {
     public User() {
     }
 
-    public User(Long userId, String name, String username, String password, String email, UserRole userRole) {
-        this.userId = userId;
+    public User(String name, String username, String password, String email, UserRole userRole) {
         this.name = name;
         this.username = username;
         this.password = password;
@@ -81,6 +81,7 @@ public class User {
                 ", name='" + name + '\'' +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
                 ", userRole=" + userRole +
                 '}';
     }

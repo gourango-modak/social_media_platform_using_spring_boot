@@ -30,7 +30,8 @@ public class CommentService {
         try {
             status = statusService.findStatusByStatusId(statusId);
         } catch (Exception e) {
-            throw new ApiRequestException(e.getMessage(), HttpStatus.NOT_FOUND);
+            System.out.println(e.getMessage());
+//            throw new ApiRequestException(e.getMessage(), HttpStatus.NOT_FOUND);
         }
         comment.setStatus(status);
         return commentRepository.save(comment);

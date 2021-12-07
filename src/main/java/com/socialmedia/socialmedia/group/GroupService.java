@@ -37,7 +37,8 @@ public class GroupService {
             user = userService.getUserByUserId(userId);
             group = groupRepository.findById(groupId).get();
         } catch (Exception e) {
-            throw new ApiRequestException(e.getMessage(), HttpStatus.NOT_FOUND);
+            System.out.println(e.getMessage());
+//            throw new ApiRequestException(e.getMessage(), HttpStatus.NOT_FOUND);
         }
         List<User> listUsers = group.getUsers();
         listUsers.add(user);

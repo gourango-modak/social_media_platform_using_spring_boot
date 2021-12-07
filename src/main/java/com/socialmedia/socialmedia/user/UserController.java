@@ -1,13 +1,15 @@
 package com.socialmedia.socialmedia.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.socialmedia.socialmedia.exception.ApiRequestException;
+import com.socialmedia.socialmedia.message.APIMessage;
 import com.socialmedia.socialmedia.security.utils.JwtUtil;
 import com.socialmedia.socialmedia.user.role.UserRole;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -45,8 +46,9 @@ public class UserController {
     }
 
     @PostMapping("/add_user")
-    public User addUser(@RequestBody User user) {
-        return userService.saveUser(user);
+    public ResponseEntity<Object> addUser(@RequestBody User user) {
+        User saveUser = userService.saveUser(user);
+        return ResponseEntity.ok(new APIMessage(HttpStatus.OK, new HashMap<>(), new HashMap<>(), saveUser));
     }
     @PostMapping("/{userId}/update_role")
     public void updateUserRole(@PathVariable("userId") Long userId, @RequestBody UserRole userRole) {
@@ -62,9 +64,11 @@ public class UserController {
             try {
                 userName = jwtUtil.extractUsername(token);
             } catch (ExpiredJwtException e) {
-                throw new ApiRequestException(e.getMessage(), FORBIDDEN);
+                System.out.println(e.getMessage());
+//                throw new ApiRequestException(e.getMessage(), FORBIDDEN);
             } catch (SignatureException e) {
-                throw new ApiRequestException(e.getMessage(), FORBIDDEN);
+                System.out.println(e.getMessage());
+//                throw new ApiRequestException(e.getMessage(), FORBIDDEN);
             }
             UserDetails userDetails = userService.loadUserByUsername(userName);
 
@@ -78,7 +82,8 @@ public class UserController {
                 new ObjectMapper().writeValue(response.getOutputStream(), tokens);
             }
         } else {
-            throw new ApiRequestException("Token is not Passed", FORBIDDEN);
+            System.out.println("Error");
+//            throw new ApiRequestException("Token is not Passed", FORBIDDEN);
         }
     }
 
