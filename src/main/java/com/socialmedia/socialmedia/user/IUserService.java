@@ -11,6 +11,9 @@ public interface IUserService {
     User saveUser(User user);
     UserRole saveRole(UserRole userRole);
     User getUserByUserId(Long userId);
+    User getUserByEmail(String email);
+    UserDetails getUserByEmailAndPassword(String email, String password);
     List<User> getAllUsers(String userName);
     UserDetails loadUserByUsername(String username);
+    User getUserFromToken(String token);
 }

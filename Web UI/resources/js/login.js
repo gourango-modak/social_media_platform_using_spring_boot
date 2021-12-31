@@ -1,6 +1,18 @@
 $(document).ready(function () {
+
+  if($.cookie("access-token")) {
+    window.location.href = "/templates/index.html";
+  }
+
+  function addLoginUserSuccessful(response) {
+    console.log(response);
+  }
+
+  function addLoginUserFailed(response) {
+    console.log(response);
+  }
+
   $("#login_form").submit(function (event) {
-    /* stop form from submitting normally */
     event.preventDefault();
 
     let email = $("#email").val();
@@ -10,34 +22,21 @@ $(document).ready(function () {
       password: password,
     };
 
-    console.log(data);
-    function loginSuccessful() {
-      console.log("Login Successful");
+    function loginSuccessful(response) {
+      $.cookie("access-token",response["result"]["access-token"]);
+      $.cookie("refresh-token",response["result"]["refresh-token"]);
+      sendRequest("http://localhost:3333/add_acitve_user", "GET", null, addLoginUserSuccessful, addLoginUserFailed, true);
+      sendLoginUserNotification();
+      window.location.href = "/templates/index.html";
     }
 
-    function loginFailed() {
-      console.log("Login Failed");
+    function loginFailed(response) {
+      
+      if(!(response))
+        $(".alert").show();
+      else $(".alert").hide();
     }
 
-    sendRequest("http://127.0.0.1:3033/login", "POST", data, loginSuccessful, loginFailed, false);
-
-    // $.ajax({
-    //   url: "http://127.0.0.1:3033/auth",
-    //   contentType: "application/json",
-    //   dataType: "json",
-    //   type: "POST",
-    //   data: JSON.stringify(data),
-    //   success: function (result) {
-    //     window.location.replace(
-    //       "http://127.0.0.1:5500/src/main/resources/static/HTML/index.html"
-    //     );
-    //     // setCookie("userId", result["userid"], 1);
-    //   },
-    //   error: function () {
-    //     alert("Enter Correct Mail & Password!!");
-    //     $("#email").val("");
-    //     $("#password").val("");
-    //   },
-    // });
+    sendRequest("http://localhost:3333/login_user", "POST", data, loginSuccessful, loginFailed, false);
   });
 });

@@ -32,10 +32,17 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if(request.getServletPath().equals("/login")) {
+
+        if(request.getServletPath().startsWith("/stomp-endpoint"))
+            filterChain.doFilter(request, response);
+        else if(request.getServletPath().equals("/login")) {
             filterChain.doFilter(request, response);
             AddMessageToResponse.addMessageToResponse(response, "Authentication Failed");
-        } else if (request.getServletPath().equals("/refresh_token") || request.getServletPath().equals("/add_user")) {
+        } else if (request.getServletPath().equals("/refresh_token") ||
+                request.getServletPath().equals("/add_user") ||
+                request.getServletPath().equals("/login_user") ||
+                request.getServletPath().equals("/posts") ||
+                request.getServletPath().equals("/active_users")) {
             filterChain.doFilter(request, response);
         } else {
             String authorizationHeader = request.getHeader(AUTHORIZATION);

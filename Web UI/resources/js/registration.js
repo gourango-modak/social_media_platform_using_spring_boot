@@ -24,8 +24,17 @@ $(document).ready(function () {
       }
 
       function registrationFail(result) {
-        let userNameError = result["error"]["username"];
-        let emailError = result["error"]["email"];
+        let userNameError = null;
+        let emailError = null;
+        if(result && result["error"]) {
+          userNameError = result["error"]["username"];
+          emailError = result["error"]["email"];
+          $(".alert").hide();
+        } else {
+            if(!(result))
+              $(".alert").show();
+            else $(".alert").hide();
+        }
         if(userNameError)
           $("#usernameHelp").text(userNameError);
         else $("#usernameHelp").text("");

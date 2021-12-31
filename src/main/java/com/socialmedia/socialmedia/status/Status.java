@@ -13,15 +13,15 @@ public class Status {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long statusId;
     private String statusDescription;
-    private int privacy;
-    @ManyToOne (fetch = FetchType.LAZY)
+    private String privacy;
+    @ManyToOne
     private Location location;
-    @ManyToOne (fetch = FetchType.LAZY)
+    @ManyToOne
     private Group group;
-    @ManyToOne (fetch = FetchType.LAZY)
+    @ManyToOne
     private User user;
 
-    public Status(String statusDescription, int privacy, Group group) {
+    public Status(String statusDescription, String privacy, Group group) {
         this.statusDescription = statusDescription;
         this.privacy = privacy;
         this.group = group;
@@ -63,11 +63,11 @@ public class Status {
         this.statusDescription = statusDescription;
     }
 
-    public int getPrivacy() {
+    public String getPrivacy() {
         return privacy;
     }
 
-    public void setPrivacy(int privacy) {
+    public void setPrivacy(String privacy) {
         this.privacy = privacy;
     }
 
@@ -77,5 +77,17 @@ public class Status {
 
     public void setGroup(Group group) {
         this.group = group;
+    }
+
+    @Override
+    public String toString() {
+        return "Status{" +
+                "statusId=" + statusId +
+                ", statusDescription='" + statusDescription + '\'' +
+                ", privacy='" + privacy + '\'' +
+                ", location=" + location +
+                ", group=" + group +
+                ", user=" + user +
+                '}';
     }
 }

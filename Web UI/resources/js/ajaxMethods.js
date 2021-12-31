@@ -1,7 +1,10 @@
 
-let TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzYWppYiIsImV4cCI6MTYzODgwOTI1MiwiaWF0IjoxNjM4ODAyMDUyfQ.cxXOM6gs6ZRJiKmocijFF0SqY9aXPFA3yBBmsX8cvVg";
+let TOKEN = $.cookie("access-token");
 
 function sendRequest(url, method, data, success, fail, isheaderInclude) {
+    
+    TOKEN = $.cookie("access-token");
+    
     let headerInfo = "";
     if(isheaderInclude == true) {
         headerInfo = {

@@ -19,8 +19,8 @@ public class GroupController {
     public Group addGroup(@RequestBody Group group) {
         return groupService.saveGroup(group);
     }
-    @GetMapping("/{userId}/{groupId}")
-    public Group addUserToAGroup(@PathVariable("userId") Long userId, @PathVariable("groupId") Long groupId) {
-        return groupService.addUserToAGroup(userId, groupId);
-    }
+//    @GetMapping("/{userId}/{groupId}")
+//    public Group addUserToAGroup(@PathVariable("userId") Long userId, @PathVariable("groupId") Long groupId) {
+//        return groupService.addUserToAGroup(userId, groupId);
+//    }
 }

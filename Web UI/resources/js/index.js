@@ -1,191 +1,207 @@
 $(document).ready(function () {
-  const WEBDOMAIN = "127.0.0.1";
-  let statusIDOfClickEvent = 0;
-
-  // if (getCookie("userid")) {
-  if (getCookie("userId") != "") {
-    $("#addPostForm").toggle("hide");
-    $("#logIn").toggle("hide");
-    $(".status-header").toggle("hide");
-    $(".main-header #registrationLink").toggle("hide");
-    getAllPosts(getCookie("userId"));
+    
+  let editStatusID = 0;
+  if($.cookie("access-token")) {
+    $("#status_form").show();
+    $("#logout").show();
+    $("#login").hide();
+    $("#active_user_section").hide();
+    $("#main-section").addClass("mx-auto");
+    $("#main-section").addClass("col-6");
+    sendRequest("http://localhost:3333/locations", "GET", null, locationDataSuccessful, locationDataFailed, true);
   } else {
-    $(".main-header").toggle("hide");
-    $(".status-header #logOut").toggle("hide");
-    getAllPosts("");
+    $("#login").show();
+    $("#logout").hide();
   }
 
-  $.ajax({
-    url: "http://127.0.0.1:3033/locations",
-    contentType: "application/json",
-    type: "GET",
-    success: function (res) {
-      res.forEach(function (loc) {
-        $("#locations").append(
-          "<option value=" + loc["name"] + ">" + loc["name"] + "</option>"
-        );
-      });
-    },
-  });
-
-  function getAllPosts(userID) {
-    $("#status_items").html("");
-    $.ajax({
-      url: "http://127.0.0.1:3033/posts/" + userID,
-      contentType: "application/json",
-      dataType: "json",
-      type: "GET",
-      success: function (result) {
-        if (result == "") return;
-        result.forEach(function (res) {
-          const statusItemHTML =
-            '<div class="status_item">\
-          <div class="edit_status" id="statusID_' +
-            res["id"] +
-            '">\
-            <i class="fas fa-edit"></i>\
-          </div>\
-          <div class="description" id="status_name">\
-            <i class="fas fa-user-friends"></i>\
-            <p>' +
-            res["user"]["fullname"] +
-            '</p>\
-          </div>\
-          <div class="description" id="status_description">\
-            <i class="far fa-comment-alt"></i>\
-            <p>' +
-            res["statusDes"] +
-            '</p>\
-          </div>\
-          <div class="description" id="status_location">\
-            <i class="fas fa-thumbtack"></i>\
-            <p>' +
-            res["location"] +
-            "</p>\
-          </div>\
-        </div>";
-          $("#status_items").append(statusItemHTML);
-          $("#statusID_" + res["id"]).on("click", function () {
-            statusIDOfClickEvent = res["id"];
-            $.ajax({
-              url:
-                "http://127.0.0.1:3033/posts/" +
-                getCookie("userId") +
-                "/" +
-                res["id"],
-              contentType: "application/json",
-              dataType: "json",
-              type: "GET",
-              success: function (result) {
-                $("#status_description").val(result["statusDes"]);
-                if (result["privacy"] == "1")
-                  $("#public").prop("checked", true);
-                else {
-                  $("#public").prop("checked", false);
-                  $("#private").prop("checked", true);
-                }
-                let location = result["location"];
-                $("select option[value=" + location + "]").attr(
-                  "selected",
-                  "selected"
-                );
-                $("#post_btn").text("Update");
-              },
-            });
-          });
-        });
-      },
+  function locationDataSuccessful(response) {
+    response.forEach(function (loc) {
+      $("#locations").append(
+        "<option value=" + loc["name"] + ">" + loc["name"] + "</option>"
+      );
     });
   }
 
-  $("#logOut").on("click", function () {
-    delete_cookie("userId", WEBDOMAIN);
+  function locationDataFailed(response) {
+    if($.cookie("access-token")) {
+      $(".alert").show();
+    }
+  }
+
+  function statusHtmlBuild(statusId, name, status_description, location) {
+    let statusEditBtn = "";
+    if($.cookie("access-token")) {
+      statusEditBtn = '<div class="btn btn-sm float-right" id="statusID_' +
+                      statusId +
+                        '">\
+                        <i class="fas fa-edit"></i>\
+                      </div>';
+    }
+    let statusItemHTML =
+            '<div class="status_item border-bottom mb-5">\
+            '+statusEditBtn+'<div class="status_des">\
+          <div id="status_username" class="d-flex">\
+            <i class="fas fa-user-friends"></i>\
+            <p class="ml-2">' +
+            name +
+            '</p>\
+          </div>\
+          <div class="d-flex" id="status_description">\
+            <i class="far fa-comment-alt"></i>\
+            <p class="ml-2">' +
+            status_description +
+            '</p>\
+          </div>\
+          <div class="d-flex" id="status_location">\
+            <i class="fas fa-thumbtack"></i>\
+            <p class="ml-2">' +
+            location +
+            "</p>\
+          </div>\
+        </div>\
+        </div>";
+    return statusItemHTML;
+  }
+
+  function getEditStatusSuccessful(response) {
+    $("#status").val(response["result"]["statusDescription"]);
+    if (response["result"]["privacy"] == "public")
+      $("#public").prop("checked", true);
+    else {
+      $("#public").prop("checked", false);
+      $("#private").prop("checked", true);
+    }
+    let location = response["result"]["location"]["name"];
+    $("select option[value=" + location + "]").attr(
+      "selected",
+      "selected"
+    );
+    $("#post_btn").text("Update");
+    editStatusID = response["result"]["statusId"];
+  }
+
+  function getEditStatusFailed() {
+    alert("get status failed");
+    // $(".alert").show();
+  }
+
+  function addEditStatusBtn(statusId) {
+    $("#statusID_"+statusId).on("click", function () {
+      const statusID = this.id.split("_")[1];
+      sendRequest("http://localhost:3333/"+statusID, "GET", null, getEditStatusSuccessful, getEditStatusFailed, true);
+    });
+  }
+
+  
+  function getAllStatusSuccessful(response) {
+    response["result"].forEach(function(res){
+        const statusItemHTML = statusHtmlBuild(res["statusId"], res["user"]["name"], res["statusDescription"], res["location"]["name"]);
+        $("#status_items").append(statusItemHTML);
+        addEditStatusBtn(res["statusId"]);
+    });
+  }
+
+  function getAllStatusFailed(response) {
+    // alert("get status failed");
+    $(".alert").show();
+  }
+
+  function getAllStatus() {
+    $("#status_items").html("");
+    sendRequest("http://localhost:3333/posts", "GET", null, getAllStatusSuccessful, getAllStatusFailed, true);
+  }
+
+  function logoutSuccessful(response) {
+    sendLoginUserNotification();
+    // console.log(response);
+  }
+
+  function logoutFailed(response) {
+    console.log(response);
+  }
+
+  $("#logout").on("click", function () {
+    sendRequest("http://localhost:3333/logout_user", "GET", null, logoutSuccessful, logoutFailed, true);
+    $.removeCookie('access-token');
+    $.removeCookie('refresh-token');
+    sendLoginUserNotification();
+    window.location.href = "/templates/index.html";
   });
 
-  $("#post_form").submit(function (event) {
-    /* stop form from submitting normally */
+  function statusSuccessful(response) {
+    const statusItemHTML = statusHtmlBuild(response["result"]["statusId"], 
+    response["result"]["user"]["name"], 
+    response["result"]["statusDescription"], 
+    response["result"]["location"]["name"]);
+    $("#status_items").append(statusItemHTML);
+    addEditStatusBtn(response["result"]["statusId"]);
+  }
+
+  function statusFailed(response) {
+    $(".alert").show();
+  }
+
+  function updateStatusSuccessful(response) {
+    getAllStatus();
+  }
+
+  function updateStatusFailed(response) {
+    alert("update status failed");
+  }
+
+  $("#status_form").submit(function (event) {
     event.preventDefault();
 
-    let statusDes = $("#status_description").val();
+    let statusDescription = $("#status").val();
     let privacy = $("input[name=privacy]:checked").val();
-    let privadyID = 0;
-    if (privacy == "public") privadyID = 1;
     let location = $("#locations option:selected").val();
-    let userId = getCookie("userId");
 
     const data = {
-      statusDes: statusDes,
-      privacy: privadyID,
+      statusDescription: statusDescription,
+      privacy: privacy,
       location: location,
     };
 
     let btnStatus = $("#post_btn").text();
-    if (btnStatus == "Update") {
-      $("#public").prop("checked", true);
-      $("#public").attr("checked", true);
-      $("#status_description").val("");
-      $("#private").attr("checked", false);
-      $("select option[value='Sylhet']").attr("selected", "selected");
-
-      $.ajax({
-        url:
-          "http://127.0.0.1:3033/add_post/" +
-          userId +
-          "/" +
-          statusIDOfClickEvent,
-        contentType: "application/json",
-        dataType: "json",
-        type: "POST",
-        data: JSON.stringify(data),
-        success: function (res) {
-          getAllPosts();
-        },
-      });
-      $("#post_btn").text("Post");
+    if (btnStatus == "Post") {
+      sendRequest("http://localhost:3333/add_status", "POST", data, statusSuccessful, statusFailed, true);
     } else {
-      $.ajax({
-        url: "http://127.0.0.1:3033/add_post/" + userId,
-        contentType: "application/json",
-        dataType: "json",
-        type: "POST",
-        data: JSON.stringify(data),
-        success: function (res) {
-          const statusItemHTML =
-            '<div class="status_item">\
-            <div class="edit_status" id="' +
-            res["user"]["userid"] +
-            '">\
-              <i class="fas fa-edit"></i>\
-            </div>\
-            <div class="description" id="status_name">\
-              <i class="fas fa-user-friends"></i>\
-              <p>' +
-            res["user"]["fullname"] +
-            '</p>\
-            </div>\
-            <div class="description" id="status_description">\
-              <i class="far fa-comment-alt"></i>\
-              <p>' +
-            res["statusDes"] +
-            '</p>\
-            </div>\
-            <div class="description" id="status_location">\
-              <i class="fas fa-thumbtack"></i>\
-              <p>' +
-            res["location"] +
-            "</p>\
-            </div>\
-          </div>";
-          $("#status_items").append(statusItemHTML);
-        },
-      });
-
-      $("#public").prop("checked", true);
-      $("#public").attr("checked", true);
-      $("#status_description").val("");
-      $("#private").attr("checked", false);
-      $("select option[value='Sylhet']").attr("selected", "selected");
-      $("#post_btn").text("Post");
+      sendRequest("http://localhost:3333/"+editStatusID, "PUT", data, updateStatusSuccessful, updateStatusFailed, true);
     }
+
+    $("#public").prop("checked", true);
+    $("#status").val("");
+    $("#private").prop("checked", false);
+    $("select option[value='Dhaka']").attr("selected", "selected");
+    $("#post_btn").text("Post");
   });
+
+
+  function getAllActiveUserSuccessful(response) {
+    $("#active_user_lists").html("");
+    response["result"].forEach(function(res){
+      let htmlBuilder = '<div class="active_user d-flex border-bottom align-items-center my-2 p-2">\
+                        <i class="fas fa-circle"></i>\
+                        <p class="ml-2 mb-0">'+res["name"]+'</p>\
+                      </div>';
+      $("#active_user_lists").append(htmlBuilder);
+
+    });
+    
+  }
+
+  function getAllActiveUserFailed(response) {
+    // alert("Error");
+    $(".alert").show();
+  }
+
+
+  function getAllActiveUsers() {
+    sendRequest("http://localhost:3333/active_users", "GET", null, getAllActiveUserSuccessful, getAllActiveUserFailed, false);
+  }
+
+  getAllStatus();
+  getAllActiveUsers();
+
+
 });

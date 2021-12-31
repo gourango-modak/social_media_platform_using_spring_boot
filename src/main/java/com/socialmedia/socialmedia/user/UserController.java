@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,11 +49,29 @@ public class UserController {
     @PostMapping("/add_user")
     public ResponseEntity<Object> addUser(@RequestBody User user) {
         User saveUser = userService.saveUser(user);
-        return ResponseEntity.ok(new APIMessage(HttpStatus.OK, new HashMap<>(), new HashMap<>(), saveUser));
+        return ResponseEntity.ok(new APIMessage(HttpStatus.OK, new HashMap<>(), new HashMap<>(), List.of(saveUser)));
     }
     @PostMapping("/{userId}/update_role")
     public void updateUserRole(@PathVariable("userId") Long userId, @RequestBody UserRole userRole) {
         userService.updateUserRole(userId, userRole);
+    }
+
+    @PostMapping("/login_user")
+    public ResponseEntity<Object> loginUser(@RequestBody Map<String,Object> body) {
+        String email = body.get("email").toString();
+        String password = body.get("password").toString();
+        User user = userService.getUserByEmail(email);
+        UserDetails userDetails = userService.getUserByEmailAndPassword(email, password);
+        return ResponseEntity.ok(new APIMessage(HttpStatus.OK, new HashMap<>(), new HashMap<>(), generateToken(userDetails)));
+    }
+
+    Map<String, String> generateToken(UserDetails userDetails) {
+        String access_token = jwtUtil.generateToken(userDetails, 120);
+        String refresh_token = jwtUtil.generateToken(userDetails, 180);
+        Map<String, String> tokens = new HashMap<>();
+        tokens.put("access-token", access_token);
+        tokens.put("refresh-token", refresh_token);
+        return tokens;
     }
 
     @GetMapping("/refresh_token")
@@ -73,11 +92,11 @@ public class UserController {
             UserDetails userDetails = userService.loadUserByUsername(userName);
 
             if (jwtUtil.validateToken(token, userDetails)) {
-                String access_token = jwtUtil.generateToken(userDetails, 120);
-                String refresh_token = jwtUtil.generateToken(userDetails, 180);
-                Map<String, String> tokens = new HashMap<>();
-                tokens.put("access-token", access_token);
-                tokens.put("refresh-token", refresh_token);
+//                String access_token = jwtUtil.generateToken(userDetails, 120);
+//                String refresh_token = jwtUtil.generateToken(userDetails, 180);
+                Map<String, String> tokens = generateToken(userDetails);
+//                tokens.put("access-token", access_token);
+//                tokens.put("refresh-token", refresh_token);
                 response.setContentType(APPLICATION_JSON_VALUE);
                 new ObjectMapper().writeValue(response.getOutputStream(), tokens);
             }

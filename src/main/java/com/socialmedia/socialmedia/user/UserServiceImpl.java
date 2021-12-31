@@ -2,9 +2,10 @@ package com.socialmedia.socialmedia.user;
 
 import com.socialmedia.socialmedia.exception.ApiRequestException;
 import com.socialmedia.socialmedia.message.APIMessage;
+import com.socialmedia.socialmedia.security.utils.JwtUtil;
 import com.socialmedia.socialmedia.user.role.UserRole;
 import com.socialmedia.socialmedia.user.role.UserRoleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.jsonwebtoken.SignatureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,12 +23,13 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
     private final IUserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtUtil jwtService;
 
-    @Autowired
-    public UserServiceImpl(IUserRepository userRepository, UserRoleRepository userRoleRepository, BCryptPasswordEncoder passwordEncoder) {
+    public UserServiceImpl(IUserRepository userRepository, UserRoleRepository userRoleRepository, BCryptPasswordEncoder passwordEncoder, JwtUtil jwtService) {
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     @Override
@@ -86,6 +88,42 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
         return userRepository.findById(userId).get();
     }
 
+    @Override
+    public User getUserByEmail(String email) {
+        User user = null;
+        try {
+            user = userRepository.findByEmail(email);
+        } catch (Exception e) {
+            throw new ApiRequestException(new APIMessage(HttpStatus.NOT_FOUND, Map.ofEntries(
+                    entry("email", "email is not found.")
+            ), new HashMap<>(), null));
+        }
+        return user;
+    }
+
+    public UserDetails getUserDetailsObjectOfUser(User user) {
+        UserDetails userDetails = null;
+        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        if(user.getUserRole() != null)
+            authorities.add(new SimpleGrantedAuthority(user.getUserRole().getName()));
+        userDetails = new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
+        return userDetails;
+    }
+
+    @Override
+    public UserDetails getUserByEmailAndPassword(String email, String password) {
+        User user = getUserByEmail(email);
+        UserDetails userDetails = null;
+        if(passwordEncoder.matches(password, user.getPassword())) {
+            userDetails = getUserDetailsObjectOfUser(user);
+        } else {
+            throw new ApiRequestException(new APIMessage(HttpStatus.NOT_FOUND, Map.ofEntries(
+                    entry("password", "password is not valid.")
+            ), new HashMap<>(), null));
+        }
+        return userDetails;
+    }
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -93,8 +131,24 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
         if(user == null)
             System.out.println("Error");
 //            throw new ApiRequestException("User Not Found!!", HttpStatus.FORBIDDEN);
-        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(user.getUserRole().getName()));
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
+        UserDetails userDetails = getUserDetailsObjectOfUser(user);
+        return userDetails;
+    }
+
+    @Override
+    public User getUserFromToken(String token) {
+        String userName = null;
+        try {
+            userName = jwtService.extractUsername(token);
+        } catch (SignatureException e) {
+            throw new ApiRequestException(new APIMessage(HttpStatus.BAD_REQUEST, Map.ofEntries(
+                    entry("token", e.getMessage())
+            ), new HashMap<>(), null));
+        } catch(Exception e) {
+            throw new ApiRequestException(new APIMessage(HttpStatus.BAD_REQUEST, Map.ofEntries(
+                    entry("token", e.getMessage())
+            ), new HashMap<>(), null));
+        }
+        return userRepository.findByUsername(userName);
     }
 }
